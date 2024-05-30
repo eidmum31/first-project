@@ -1,26 +1,22 @@
 import { Student } from './student.interface';
 import Students from './student.model';
 
-const createStudentInDb = async (student: Student) => {
-  // const newStudent = new Students(student);
-
-  // if (await newStudent.isUserExists(student.id)) {
-  //   throw new Error('User already exits');
-  // }
-  if (await Students.isUserExists(student.id)) {
-    throw new Error('User already exits');
-  }
-
-  const result = await Students.create(student);
-  return result;
-};
-
 const getAllStudentsFromDb = async () => {
-  const result = await Students.find();
+  const result = await Students.find().populate({
+    path:"academicDepartment",
+    populate:{
+      path:"academicFaculty"
+    }
+  }).populate("academicSemester");
   return result;
 };
 const getSingleStudentFromDb = async (id: string) => {
-  const result = await Students.findOne({ id: id });
+  const result = await Students.findOne({ id: id }).populate({
+    path:"academicDepartment",
+    populate:{
+      path:"academicFaculty"
+    }
+  }).populate("academicSemester");
   return result;
 };
 const deleteStudentFromDb = async (id: string) => {
@@ -32,7 +28,6 @@ const deleteStudentFromDb = async (id: string) => {
 };
 
 export const studentServices = {
-  createStudentInDb,
   getAllStudentsFromDb,
   getSingleStudentFromDb,
   deleteStudentFromDb,

@@ -53,39 +53,42 @@ const localGuardianSchema = z.object({
 });
 
 const studentSchema = z.object({
-  id: z.string().min(1, { message: 'ID is a required field' }),
-  password: z.string().max(20, { message: 'password must be within 20' }),
-  name: userNameSchema,
-  gender: z.enum(['male', 'female'], {
-    errorMap: () => ({ message: 'Gender is not supported' }),
+  body: z.object({
+    password: z.string().max(20).optional(),
+    student: z.object({
+      id: z.string().min(1, { message: 'ID is a required field' }),
+      name: userNameSchema,
+      gender: z.enum(['male', 'female'], {
+        errorMap: () => ({ message: 'Gender is not supported' }),
+      }),
+      dateOfBirth: z.string().optional(),
+      academicSemester: z.string(),
+      academicDepartment:z.string(),
+      contactNo: z
+        .string()
+        .min(1, { message: 'Contact number is a required field' }),
+      emergencyContactNo: z
+        .string()
+        .min(1, { message: 'Emergency contact number is a required field' }),
+      bloodGroup: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'], {
+        errorMap: () => ({ message: 'Blood group is not supported' }),
+      }),
+      presentAddress: z
+        .string()
+        .min(1, { message: 'Present address is a required field' }),
+      permanentAddress: z
+        .string()
+        .min(1, { message: 'Permanent address is a required field' }),
+      guardian: guardianSchema,
+      localGuardian: localGuardianSchema,
+      email: z
+        .string()
+        .min(1, { message: 'Email must be given' })
+        .email({ message: 'Email is not valid' }),
+      profileImg: z.string().optional(),
+      isDeleted: z.boolean().optional(),
+    }),
   }),
-  dateOfBirth: z
-    .string()
-    .min(1, { message: 'Date of birth is a required field' }),
-  contactNo: z
-    .string()
-    .min(1, { message: 'Contact number is a required field' }),
-  emergencyContactNo: z
-    .string()
-    .min(1, { message: 'Emergency contact number is a required field' }),
-  bloodGroup: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'], {
-    errorMap: () => ({ message: 'Blood group is not supported' }),
-  }),
-  presentAddress: z
-    .string()
-    .min(1, { message: 'Present address is a required field' }),
-  permanentAddress: z
-    .string()
-    .min(1, { message: 'Permanent address is a required field' }),
-  guardian: guardianSchema,
-  localGuardian: localGuardianSchema,
-  email: z
-    .string()
-    .min(1, { message: 'Email must be given' })
-    .email({ message: 'Email is not valid' }),
-  profileImg: z.string().optional(),
-  isActive: z.enum(['active', 'blocked']).default('active'),
-  isDeleted: z.boolean().optional(),
 });
 
 export default studentSchema;

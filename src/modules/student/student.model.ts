@@ -6,12 +6,11 @@ import {
   TGurdian,
   TLocalGuardian,
   TUserName,
-  studentMethods,
 } from './student.interface';
 import validator from 'validator';
 import { NextFunction } from 'express';
 import config from '../../app/config';
-import { boolean } from 'joi';
+import { boolean, date } from 'joi';
 const userNameSchema = new Schema<TUserName>({
   firstName: {
     type: String,
@@ -91,11 +90,6 @@ const studentSchema = new Schema<Student, StudentModel>(
       unique: true,
       required: [true, 'ID is a required field'],
     },
-    password: {
-      type: String,
-      required: true,
-      maxlength: [20, 'password must be within 20'],
-    },
     name: {
       type: userNameSchema,
       required: [true, 'Name is a required field'],
@@ -115,6 +109,16 @@ const studentSchema = new Schema<Student, StudentModel>(
     contactNo: {
       type: String,
       required: [true, 'Contact number is a required field'],
+    },
+    academicSemester: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: 'AcademicSemester',
+    },
+    academicDepartment:{
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: 'AcademicDepartment',
     },
     emergencyContactNo: {
       type: String,
@@ -158,10 +162,11 @@ const studentSchema = new Schema<Student, StudentModel>(
     isDeleted: { type: Boolean, default: false },
     profileImg: String,
 
-    isActive: {
-      type: String,
-      enum: ['active', 'blocked'],
-      default: 'active',
+    user: {
+      type: Schema.Types.ObjectId,
+      unique: true,
+      required: [true, 'User id is a required field'],
+      ref: 'User',
     },
   },
   {
@@ -181,18 +186,18 @@ studentSchema.statics.isUserExists = async function (id: string) {
   const result = await Students.findOne({ id });
   return result;
 };
-studentSchema.pre('save', async function (next) {
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
-  const user = this;
-  user.password = await bcrypt.hash(user.password, Number(config.salt));
-  next();
-});
+// studentSchema.pre('save', async function (next) {
+//   // eslint-disable-next-line @typescript-eslint/no-this-alias
+//   const user = this;
+//   user.password = await bcrypt.hash(user.password, Number(config.salt));
+//   next();
+// });
 
-studentSchema.post('save', function (doc, next) {
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
-  doc.password = '';
-  next();
-});
+// studentSchema.post('save', function (doc, next) {
+//   // eslint-disable-next-line @typescript-eslint/no-this-alias
+//   doc.password = '';
+//   next();
+// });
 
 studentSchema.pre('find', function (next) {
   this.find({ isDeleted: false });
